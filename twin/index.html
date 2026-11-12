@@ -1,0 +1,407 @@
+<title>TRACE FrED Twin</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<script>window.MathJax={startup:{typeset:false},svg:{fontCache:"none"}};</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+:root{--bg:#eceff0;--panel:#f8f9f9;--ink:#14181b;--muted:#59646b;--line:#d3d9dc;--soft:#e3e8ea;--accent:#6d28d9;--stage:#dfe4e6;--metal:#aab3b8;--dark:#2a2f33;--red:#c0392b;--good:#1a7f4b;--warn:#b45309}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1316;--panel:#171c20;--ink:#e7ebed;--muted:#8e9aa2;--line:#2a3238;--soft:#1f262b;--accent:#b794f6;--stage:#12171a;--metal:#5d6870;--dark:#0a0c0e;--red:#e0584a;--good:#4cc38a;--warn:#f0a35a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1316;--panel:#171c20;--ink:#e7ebed;--muted:#8e9aa2;--line:#2a3238;--soft:#1f262b;--accent:#b794f6;--stage:#12171a;--metal:#5d6870;--dark:#0a0c0e;--red:#e0584a;--good:#4cc38a;--warn:#f0a35a;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 'Instrument Sans',system-ui,sans-serif;padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:14px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:grid;place-items:center}
+h1{font-size:18px;margin:0;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:12.5px}
+.sp{flex:1}
+button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 11px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:minmax(0,330px) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.card h2{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:0 0 10px;font-weight:600}
+.ctl{display:grid;gap:4px;margin-bottom:14px}
+.ctl .row{display:flex;justify-content:space-between;align-items:baseline}
+.ctl .v{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg button{padding:8px 0}
+.seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kpi{background:var(--soft);border-radius:9px;padding:8px 10px}
+.kpi b{display:block;font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:500}
+.kpi span{font-size:11px;color:var(--muted)}
+.stage{background:var(--stage);border-radius:10px;border:1px solid var(--line);overflow:hidden}
+#scene,#chart{display:block;width:100%;height:auto}mjx-assistive-mml{display:none!important}.eq svg{display:inline-block}
+.note{font-size:12px;color:var(--muted)}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11.5px;font-weight:600}
+.b-ok{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.b-warn{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
+.two{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px}
+@media(max-width:860px){.two{grid-template-columns:minmax(0,1fr)}}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+td,th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--muted);font-weight:500}
+td.n{font-family:'JetBrains Mono',monospace;text-align:right}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes air{0%{opacity:0;transform:translateX(0)}20%{opacity:.85}100%{opacity:0;transform:translateX(var(--dx))}}
+.spool{transform-box:fill-box;transform-origin:center}
+.puff{animation:air var(--dur) linear infinite;opacity:0}
+.eqs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.eq{background:var(--soft);border-radius:10px;padding:10px 12px;min-width:0}
+.eq.wide{grid-column:1/-1}
+.eq h3{margin:0 0 4px;font-size:12.5px;font-weight:600}
+.eq .f{overflow-x:auto;padding:2px 0}.eq .f mjx-container,.eq .s mjx-container{margin:2px 0!important}.eq .f svg,.eq .s svg{max-width:none}
+.eq .s{color:var(--muted);margin-top:4px;overflow-x:auto;font-size:13px;border-top:1px dashed var(--line);padding-top:4px}
+.eq .s b{color:var(--accent)}
+.eq p{margin:6px 0 0;font-size:12px;color:var(--muted)}
+@keyframes pulse{0%,100%{opacity:.15}50%{opacity:1}}
+.vane{opacity:.4}
+</style>
+<div class="wrap">
+<header>
+ <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M3 5c6 0 7 12 18 13"/></svg></div>
+ <div><h1>TRACE · FrED digital twin</h1><div class="sub">Fiber cooling predicted from 78 thermal-camera photos (26 conditions, black background)</div></div>
+ <div class="sp"></div>
+ <button id="theme" title="Toggle theme">◐ Theme</button>
+</header>
+
+<div class="grid">
+ <div style="display:grid;gap:14px;min-width:0">
+  <div class="card">
+   <h2>Process inputs</h2>
+   <div class="ctl"><div class="row"><label for="T">Nozzle temperature</label><span class="v" id="Tv"></span></div><input id="T" type="range" min="90" max="110" step="1" value="100"></div>
+   <div class="ctl"><div class="row"><label for="R">Spooling speed</label><span class="v" id="Rv"></span></div><input id="R" type="range" min="20" max="40" step="1" value="30"></div>
+   <div class="ctl"><div class="row"><span>Cooling fans</span><span class="v" id="Fv"></span></div>
+    <div class="seg" id="F"><button data-f="0">Off</button><button data-f="1">Mid</button><button data-f="2">On</button></div></div>
+   <div class="note" id="status"></div>
+  </div>
+  <div class="card">
+   <h2>Predicted</h2>
+   <div class="kpis">
+    <div class="kpi"><b id="kD"></b><span>Fiber diameter</span></div>
+    <div class="kpi"><b id="kV"></b><span>Fiber speed (spool)</span></div>
+    <div class="kpi"><b id="kP"></b><span>Apparent T at 0.2 cm</span></div>
+    <div class="kpi"><b id="kH"></b><span>Cools to 50 % excess at</span></div>
+    <div class="kpi"><b id="k40"></b><span>Below 40 °C after</span></div>
+    <div class="kpi"><b id="kt"></b><span>Time nozzle → 1 cm</span></div>
+   </div>
+   <p class="note" style="margin:10px 0 0">Temperatures are what the camera reads (apparent): the fiber is thinner than one pixel, so true fiber temperature is higher.</p>
+  </div>
+ </div>
+
+ <div style="display:grid;gap:14px;min-width:0">
+  <div class="card">
+   <h2>Digital twin</h2>
+   <div class="stage">
+   <svg id="scene" viewBox="0 0 520 800" role="img" aria-label="FrED illustration with live fiber temperature">
+    <defs>
+     <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7"/></filter>
+     <filter id="soft"><feGaussianBlur stdDeviation="2.2"/></filter>
+     <pattern id="holes" width="22" height="22" patternUnits="userSpaceOnUse" x="3"><circle cx="11" cy="11" r="3.2" fill="var(--stage)"/></pattern>
+     <pattern id="stripes" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#8a1d14"/><rect width="12" height="5" fill="#d8dde0"/></pattern>
+    </defs>
+    <!-- plate -->
+    <rect x="203" y="8" width="114" height="600" fill="var(--soft)" stroke="var(--line)"/>
+    <rect x="203" y="8" width="114" height="600" fill="url(#holes)" opacity=".9"/>
+    <!-- red central column, traverse arm with knob, side boxes -->
+    <rect x="250" y="430" width="20" height="176" rx="3" fill="var(--red)"/>
+    <polygon points="268,486 340,500 384,512 340,536 268,534" fill="var(--red)"/><circle cx="318" cy="516" r="8" fill="var(--stage)"/><circle cx="346" cy="516" r="5" fill="var(--stage)"/>
+    <rect x="384" y="500" width="14" height="24" rx="2" fill="var(--red)"/><rect x="398" y="508" width="8" height="8" fill="var(--metal)"/>
+    <rect x="124" y="552" width="86" height="38" rx="4" fill="var(--dark)"/><g fill="var(--metal)"><circle cx="134" cy="562" r="2.5"/><circle cx="200" cy="562" r="2.5"/><circle cx="134" cy="580" r="2.5"/><circle cx="200" cy="580" r="2.5"/></g><rect x="100" y="568" width="24" height="5" fill="var(--metal)"/>
+    <rect x="316" y="552" width="48" height="38" rx="4" fill="var(--dark)"/><rect x="364" y="568" width="16" height="5" fill="var(--metal)"/>
+    <g id="ruler" font-size="10" font-family="JetBrains Mono" fill="var(--muted)"></g>
+    <!-- motor + bracket + heater -->
+    <rect x="150" y="16" width="62" height="70" rx="3" fill="var(--dark)"/>
+    <rect x="212" y="8" width="104" height="86" rx="14" fill="var(--metal)"/>
+    <rect x="222" y="30" width="22" height="34" rx="4" fill="var(--dark)" opacity=".7"/>
+    <g stroke="var(--dark)" stroke-width="2.4" opacity=".75"><line x1="236" y1="84" x2="284" y2="84"/><line x1="236" y1="90" x2="284" y2="90"/></g>
+    <rect id="glowN" x="226" y="94" width="68" height="56" rx="10" fill="#f60" filter="url(#glow)" opacity=".5"/>
+    <rect id="nozzle" x="230" y="96" width="60" height="44" rx="6" fill="#f60" stroke="var(--dark)" stroke-width="2"/>
+    <text id="nozTxt" x="260" y="115" text-anchor="middle" font-size="16" font-weight="700" fill="#fff" font-family="Instrument Sans">HOT</text>
+    <text id="nozT" x="260" y="132" text-anchor="middle" font-size="11" fill="#fff" font-family="JetBrains Mono">100 °C</text>
+    <rect x="251" y="140" width="18" height="12" fill="#2c5fd0"/>
+    <polygon points="253,152 267,152 262,162 258,162" fill="var(--dark)"/>
+    <!-- fans: red shroud + two black fans angled inward -->
+    <path d="M196 184 H324 L300 226 H220 Z" fill="var(--red)"/>
+    <g id="fanL"><polygon points="196,196 236,234 214,284 172,238" fill="var(--dark)"/><g id="ledL"></g></g>
+    <g id="fanR"><polygon points="324,196 284,234 306,284 348,238" fill="var(--dark)"/><g id="ledR"></g></g>
+    <!-- fiber -->
+    <g id="halo" filter="url(#soft)" opacity=".5"></g>
+    <g id="fiber"></g>
+    <g id="air"></g>
+    <!-- axis break -->
+    <rect x="232" y="396" width="56" height="26" fill="var(--stage)"/>
+    <path d="M226 396 l10 5 -10 5 10 5 -10 5 M294 396 l-10 5 10 5 -10 5 10 5" stroke="var(--muted)" fill="none"/>
+    <text x="260" y="413" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="JetBrains Mono">not to scale</text>
+    <line x1="260" y1="422" x2="260" y2="600" stroke="var(--muted)" stroke-width="1.6"/>
+    <!-- upper pulley, diameter camera -->
+    <g><rect x="244" y="440" width="32" height="26" rx="4" fill="var(--red)"/><circle cx="260" cy="453" r="8" fill="var(--dark)"/></g>
+    <g><rect x="86" y="496" width="96" height="34" rx="7" fill="var(--dark)"/><rect x="178" y="488" width="52" height="50" rx="6" fill="var(--red)"/><rect x="230" y="496" width="22" height="34" rx="3" fill="var(--dark)"/><path d="M86 513 q-40 -6 -40 20 t40 4" fill="none" stroke="var(--dark)" stroke-width="2.4"/><rect x="252" y="500" width="16" height="26" fill="var(--red)"/></g>
+    <text id="dTag" x="106" y="480" font-size="12" fill="var(--ink)" font-family="JetBrains Mono" font-weight="500"></text>
+    <text x="106" y="548" font-size="10" fill="var(--muted)" font-family="JetBrains Mono">diameter camera</text>
+    <g><rect x="244" y="576" width="32" height="26" rx="4" fill="var(--red)"/><circle cx="260" cy="589" r="8" fill="var(--dark)"/></g>
+    <!-- spool (side view): rotates + traverses left-right -->
+    <path id="toSpool" d="M260 600 L330 640" stroke="var(--muted)" stroke-width="1.6" fill="none"/>
+    <!-- lift-here handle + white shaft -->
+    <rect x="60" y="662" width="196" height="10" rx="5" fill="#eceff0" stroke="var(--line)"/>
+    <rect x="66" y="642" width="140" height="44" rx="4" fill="var(--red)"/><text x="136" y="670" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="Instrument Sans" letter-spacing="1">LIFT HERE</text>
+    <rect x="86" y="686" width="100" height="18" fill="var(--dark)" opacity=".85"/>
+    <g id="spoolG">
+     <rect x="-46" y="-6" width="92" height="64" rx="3" fill="none"/>
+     <rect x="-46" y="0" width="9" height="62" rx="2" fill="var(--red)"/><rect x="37" y="0" width="9" height="62" rx="2" fill="var(--red)"/>
+     <rect id="hub" x="-37" y="10" width="74" height="42" fill="url(#stripes)" patternTransform="translate(0 0)"/>
+     <rect x="-37" y="10" width="74" height="42" fill="none" stroke="#5b86ff" stroke-width="2.4"/>
+    </g>
+    <rect x="60" y="706" width="400" height="16" rx="3" fill="var(--red)"/>
+    <text id="spoolTxt" x="260" y="718" text-anchor="middle" font-size="10" fill="#fff" font-family="JetBrains Mono"></text>
+    <!-- RPi / PCB base -->
+    <rect x="56" y="724" width="408" height="30" rx="4" fill="#9aa4aa"/>
+    <rect x="64" y="754" width="30" height="40" rx="8" fill="#9aa4aa"/><rect x="426" y="754" width="30" height="40" rx="8" fill="#9aa4aa"/>
+    <rect x="98" y="754" width="324" height="36" rx="4" fill="var(--dark)"/>
+    <text x="130" y="777" font-size="13" font-weight="700" fill="#9aa4aa" font-family="JetBrains Mono">RPi</text><text x="368" y="777" font-size="13" font-weight="700" fill="#9aa4aa" font-family="JetBrains Mono">PCB</text>
+    <rect x="200" y="762" width="120" height="22" rx="3" fill="#1d6b4a"/><rect x="214" y="766" width="18" height="14" fill="var(--metal)"/><rect x="238" y="766" width="14" height="14" fill="var(--metal)"/><rect x="262" y="766" width="30" height="14" fill="#3a3f44"/>
+    <g id="callout" style="display:none;pointer-events:none"><line id="cline" stroke="var(--accent)" stroke-width="1.5"/><rect id="cbox" width="150" height="66" rx="8" fill="var(--panel)" stroke="var(--accent)" stroke-width="1.5"/><text id="c1" x="10" y="19" font-size="11" fill="var(--muted)" font-family="JetBrains Mono"></text><text id="c2" x="10" y="42" font-size="20" font-weight="700" fill="var(--ink)" font-family="JetBrains Mono"></text><text id="c3" x="10" y="58" font-size="10.5" fill="var(--muted)" font-family="JetBrains Mono"></text></g>
+    <rect id="hit" x="222" y="156" width="76" height="250" fill="transparent" style="cursor:crosshair"/>
+    <g id="probe" style="display:none"><circle r="6" fill="none" stroke="var(--accent)" stroke-width="2.2"/><text id="probeT" x="14" y="4" font-size="11" fill="var(--ink)" font-family="JetBrains Mono" font-weight="500"></text></g>
+   </svg></div>
+   <div class="legend"><span><span class="dot" style="background:linear-gradient(90deg,#4659c8,#a33c8c,#f56e28,#fff5aa);width:60px;border-radius:3px"></span>24 → 105 °C apparent</span><span>Fiber width drawn ×10 for visibility</span><span>Click the fiber (or hover the chart) to read its temperature</span></div>
+  </div>
+
+  <div class="card">
+   <h2>Temperature vs distance to nozzle</h2>
+   <svg id="chart" viewBox="0 0 660 300" style="touch-action:none"></svg>
+   <div class="legend" id="clegend"></div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+    <button id="pin">Pin this curve</button><button id="clear">Clear pins</button><button id="copy">Copy curve as CSV</button><label class="note" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="showAll" checked> show measured conditions</label>
+   </div>
+  </div>
+
+  <div class="card">
+   <h2>Operating map: nozzle temperature × spool speed</h2>
+   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px"><label for="hm" class="note">Show</label>
+    <select id="hm" style="font:inherit;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:5px 8px"><option value="T">Apparent T at selected distance</option><option value="d">Fiber diameter</option><option value="L">Cooling length (50 % excess)</option></select>
+    <span class="note" id="hmDist"></span></div>
+   <svg id="heat" viewBox="0 0 660 330" style="touch-action:none;cursor:crosshair"></svg>
+   <div class="note" id="hmInfo" style="margin-top:6px">Click the map to jump to that setting. Fan position follows the current selection. Open circles = measured settings.</div>
+  </div>
+  <div class="card">
+   <h2>Fan effect (same nozzle temperature and spool speed)</h2>
+   <svg id="fanc" viewBox="0 0 660 300"></svg>
+   <div class="legend" id="fanLeg"></div>
+   <p class="note" id="fanTxt" style="margin:8px 0 0"></p>
+  </div>
+ </div>
+</div>
+
+
+<div class="card"><h2>Model & equations (live values)</h2>
+ <div class="eqs" id="eqs"></div>
+</div>
+<div class="two">
+ <div class="card"><h2>What the data says (sensitivity at the selected distance)</h2>
+  <div class="note" style="margin-bottom:6px">Distance: <input id="sd" type="range" min="0.2" max="4" step="0.1" value="1" style="width:160px;vertical-align:middle"> <b id="sdv" style="font-family:'JetBrains Mono'"></b></div>
+  <table><thead><tr><th>Change</th><th style="text-align:right">Δ apparent T</th></tr></thead><tbody id="eff"></tbody></table>
+  <p class="note" style="margin:10px 0 0">From the 78-photo ANOVA on the cooling length (R² = 0.71): fan ≫ nozzle temperature &gt; spool speed (spool speed barely significant, p = 0.05). Fans shorten the cooling length by ≈20 % (Mid) and ≈19 % (On), at all three nozzle temperatures. A hotter nozzle keeps the fiber hotter over the first centimeters. Photo-to-photo repeatability of the cooling length ≈ 4 %.</p>
+ </div>
+ <div class="card"><h2>How far to trust it</h2>
+  <table><tbody>
+   <tr><td>Profile error (leave-one-condition-out)</td><td class="n" id="qA"></td></tr>
+   <tr><td>Same-condition photo scatter</td><td class="n">≈ 1.1 °C</td></tr>
+   <tr><td>Diameter error (leave-one-out)</td><td class="n" id="qD"></td></tr>
+   <tr><td>Conditions measured</td><td class="n">26 of 27</td></tr>
+   <tr><td>Never measured</td><td class="n">110 °C · 20 rpm · Off</td></tr>
+  </tbody></table>
+  <p class="note" style="margin:10px 0 0">Model: a semi-physical curve T = T_b + a·exp(−x/L) + c whose three coefficients depend log-linearly on nozzle temperature, spooler speed and fan level (12 parameters). It is fitted to the photos, so don’t read it outside 90–110 °C and 20–40 rpm. Spool radius 0.765 cm; camera scale calibrated per photo from the 2.5 cm heater width. Photos taken against a black background; diameters measured by the FrED camera. At 20 rpm the spool speed oscillates (about 6–34 rpm), so the 20 rpm profiles are the least reliable.</p>
+ </div>
+</div>
+</div>
+<script>const DATA={"B":[[81.857,80.806,79.734,78.655,77.529,76.403,75.28,74.108,72.958,71.797,70.595,69.45,68.294,67.168,66.02,64.886,63.749,62.631,61.507,60.381,59.293,58.26,57.225,56.255,55.334,54.403,53.534,52.664,51.85,51.08,50.328,49.616,48.907,48.244,47.607,47.004,46.39,45.81,45.276,44.733,44.243,43.76,43.301,42.87,42.459,42.036,41.625,41.218,40.887,40.546,40.201,39.881,39.574,39.268,38.993,38.748,38.467,38.22,37.995,37.757,37.53,37.305,37.083,36.895,36.709,36.526,36.337,36.166,35.958,35.79,35.597,35.451,35.301,35.113,34.996,34.861,34.718,34.609,34.492,34.384,34.287,34.175,34.09,33.999,33.912,33.831,33.741,33.66,33.57,33.512,33.426,33.35,33.318,33.259,33.195,33.136,33.083,33.042,33.005,32.98,32.908],[8.372,8.253,8.151,8.039,7.894,7.769,7.649,7.47,7.327,7.187,7.063,6.968,6.842,6.737,6.604,6.459,6.32,6.147,6.006,5.793,5.647,5.535,5.437,5.309,5.219,5.138,5.024,4.925,4.774,4.698,4.602,4.523,4.438,4.358,4.31,4.212,4.166,4.09,4.064,4.021,3.964,3.945,3.901,3.825,3.737,3.705,3.643,3.552,3.507,3.493,3.404,3.358,3.325,3.285,3.206,3.183,3.146,3.159,3.119,3.07,3.024,3.011,2.96,2.901,2.884,2.864,2.83,2.803,2.763,2.742,2.685,2.658,2.635,2.605,2.567,2.516,2.498,2.47,2.441,2.377,2.343,2.31,2.328,2.306,2.271,2.26,2.236,2.241,2.209,2.158,2.159,2.15,2.132,2.109,2.082,2.033,2.02,1.991,1.984,1.935,1.919],[0.453,0.527,0.599,0.635,0.666,0.69,0.717,0.742,0.764,0.802,0.841,0.829,0.828,0.805,0.792,0.746,0.68,0.663,0.637,0.635,0.638,0.633,0.616,0.611,0.568,0.563,0.561,0.615,0.585,0.591,0.551,0.56,0.556,0.566,0.533,0.532,0.524,0.531,0.496,0.515,0.47,0.448,0.407,0.426,0.435,0.416,0.403,0.407,0.379,0.37,0.352,0.332,0.347,0.341,0.34,0.367,0.359,0.369,0.368,0.358,0.367,0.321,0.309,0.311,0.299,0.309,0.306,0.291,0.283,0.295,0.257,0.274,0.267,0.309,0.299,0.316,0.306,0.318,0.331,0.327,0.345,0.356,0.355,0.335,0.325,0.334,0.327,0.318,0.305,0.316,0.279,0.286,0.305,0.302,0.294,0.337,0.296,0.334,0.342,0.28,0.32],[-0.796,-0.815,-0.861,-0.894,-0.949,-1.026,-1.103,-1.183,-1.271,-1.395,-1.454,-1.521,-1.571,-1.645,-1.73,-1.822,-1.886,-1.979,-2.081,-2.151,-2.269,-2.359,-2.434,-2.495,-2.585,-2.654,-2.711,-2.756,-2.817,-2.866,-2.941,-2.964,-2.994,-2.979,-3.005,-3.036,-3.062,-3.086,-3.063,-3.058,-3.048,-3.036,-3.083,-3.106,-3.087,-3.092,-3.089,-3.065,-3.057,-3.058,-3.016,-3.018,-2.994,-2.991,-2.988,-2.978,-2.994,-2.987,-2.931,-2.953,-2.948,-2.959,-2.933,-2.926,-2.926,-2.916,-2.902,-2.889,-2.885,-2.854,-2.87,-2.819,-2.819,-2.801,-2.819,-2.763,-2.741,-2.716,-2.693,-2.675,-2.659,-2.655,-2.606,-2.594,-2.587,-2.591,-2.556,-2.533,-2.532,-2.498,-2.487,-2.492,-2.488,-2.444,-2.421,-2.424,-2.41,-2.345,-2.347,-2.36,-2.346]],"sd":[1.9,1.9,2.0,2.0,2.0,2.1,2.1,2.2,2.2,2.3,2.3,2.3,2.4,2.4,2.5,2.5,2.5,2.5,2.6,2.5,2.5,2.5,2.5,2.6,2.6,2.5,2.5,2.5,2.5,2.4,2.4,2.4,2.4,2.3,2.3,2.3,2.3,2.2,2.2,2.2,2.2,2.2,2.2,2.1,2.1,2.1,2.1,2.1,2.0,2.0,2.0,2.0,1.9,1.9,1.9,1.8,1.8,1.8,1.8,1.8,1.8,1.8,1.8,1.8,1.8,1.8,1.7,1.7,1.8,1.7,1.7,1.7,1.7,1.7,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6],"Bd":[-0.948,0.0878,-0.1337,0.0093],"means":{"90_20_MID":[75.3,73.2,71.1,69.0,66.7,64.6,62.6,60.7,58.6,56.7,54.8,52.9,51.1,49.4,47.9,46.6,45.3,44.0,42.8,41.7,40.6,39.7,39.0,38.2,37.6,36.9,36.2,35.6,35.0,34.5,34.1,33.6,33.3,32.9,32.4,32.2,31.9,31.7,31.4,31.2,31.1,30.9,30.7,30.5,30.4,30.2,30.1,30.1,30.0,29.9,29.9],"90_20_OFF":[74.6,72.4,70.3,68.1,65.9,63.9,62.0,59.8,58.1,56.3,54.5,52.9,51.4,49.9,48.7,47.5,46.3,45.1,44.2,43.3,42.1,41.5,40.7,40.0,39.4,38.7,38.1,37.8,37.3,36.7,36.3,35.9,35.6,35.3,35.1,34.8,34.4,34.1,33.7,33.5,33.3,33.1,32.9,32.8,32.6,32.4,32.3,32.1,32.1,31.8,31.8],"90_20_ON":[73.1,71.1,69.0,67.0,64.9,62.5,60.2,57.9,55.7,53.5,51.5,49.7,48.0,46.1,44.7,43.1,41.7,40.6,39.4,38.4,37.6,36.6,35.9,35.2,34.6,34.1,33.5,33.2,32.8,32.4,32.1,31.8,31.6,31.2,30.9,30.8,30.5,30.3,30.2,30.0,29.9,29.9,29.9,29.6,29.7,29.7,29.5,29.5,29.5,29.5,29.5],"90_30_MID":[72.4,70.1,67.9,65.5,63.2,60.8,58.5,56.2,54.1,51.7,49.9,47.7,45.9,44.4,42.8,41.5,40.1,39.1,38.2,37.4,36.7,35.9,35.3,34.7,34.3,33.8,33.5,33.2,32.8,32.5,32.3,32.0,31.9,31.6,31.4,31.3,31.1,31.0,30.9,30.8,30.8,30.6,30.6,30.5,30.4,30.3,30.3,30.3,30.3,30.3,30.3],"90_30_OFF":[75.0,73.3,71.3,69.3,67.4,65.3,63.1,61.1,59.1,57.2,55.2,53.3,51.7,50.0,48.4,47.0,45.6,44.4,43.3,42.3,41.2,40.4,39.7,38.9,38.1,37.7,37.1,36.7,36.2,35.7,35.3,35.0,34.8,34.5,34.2,33.7,33.6,33.4,33.1,32.9,32.7,32.4,32.3,32.1,32.0,31.9,31.8,31.7,31.6,31.5,31.6],"90_30_ON":[74.3,72.5,70.7,68.9,67.1,65.3,63.5,61.4,59.3,57.4,55.3,53.3,51.6,49.8,48.3,46.6,45.2,43.8,42.7,41.5,40.5,39.6,38.8,38.1,37.5,36.9,36.2,35.8,35.3,34.9,34.4,34.1,33.8,33.4,33.1,32.8,32.7,32.4,32.2,32.1,32.1,31.9,31.9,31.7,31.6,31.7,31.6,31.7,31.5,31.7,31.5],"90_40_MID":[75.6,74.1,72.2,70.4,68.4,66.3,64.2,62.1,60.1,58.0,56.0,54.0,52.0,50.3,48.7,47.0,45.7,44.4,43.1,42.0,41.2,40.1,39.5,38.8,37.9,37.4,36.8,36.2,35.9,35.5,35.1,34.7,34.4,34.1,33.7,33.4,33.2,33.0,32.8,32.6,32.4,32.3,32.3,32.2,32.0,31.9,31.9,31.7,31.7,31.6,31.6],"90_40_OFF":[74.7,73.1,71.5,69.5,67.9,66.0,64.3,62.5,60.7,59.1,57.7,56.1,54.6,53.2,52.0,50.7,49.5,48.3,47.3,46.2,45.2,44.2,43.7,42.9,42.4,41.6,41.0,40.5,40.0,39.4,39.1,38.7,38.3,37.8,37.4,37.0,36.6,36.3,36.0,35.9,35.8,35.6,35.3,35.0,34.6,34.3,34.1,33.9,34.0,34.0,33.9],"90_40_ON":[73.1,71.3,69.3,67.0,64.8,62.4,60.1,57.9,55.8,53.7,51.7,49.7,48.0,46.3,44.8,43.5,42.3,41.2,40.2,39.1,38.3,37.4,36.8,36.1,35.4,34.8,34.2,33.9,33.4,33.0,32.7,32.1,31.8,31.7,31.4,31.1,30.9,30.7,30.6,30.4,30.3,30.3,30.1,30.2,30.0,29.9,30.0,29.9,29.8,29.9,29.8],"100_20_MID":[79.5,76.4,73.8,71.0,68.3,65.6,63.0,60.7,58.5,56.4,54.3,52.2,50.3,48.6,46.7,45.5,44.3,43.4,42.2,41.4,40.3,39.4,38.7,37.9,37.2,36.5,36.1,35.4,35.0,34.6,34.2,33.8,33.4,33.0,32.6,32.4,32.1,31.8,31.5,31.4,31.2,31.0,30.9,30.7,30.6,30.5,30.3,30.2,30.0,29.9,29.9],"100_20_OFF":[78.4,76.4,74.6,72.5,70.4,68.2,66.1,64.3,62.5,60.9,59.2,57.7,56.2,55.0,53.7,52.5,51.3,50.1,49.1,48.1,47.4,46.5,45.8,45.0,44.3,43.9,43.4,42.9,42.4,41.9,41.5,41.1,40.7,40.4,40.1,39.8,39.5,39.2,39.0,38.6,38.5,38.3,38.0,38.0,37.9,37.7,37.7,37.5,37.5,37.4,37.3],"100_20_ON":[80.6,78.8,77.0,74.8,72.4,70.0,67.6,65.6,63.6,61.2,58.7,56.6,54.8,52.9,51.0,49.6,48.2,46.9,45.5,44.2,43.2,42.2,41.0,40.1,39.4,38.6,38.0,37.4,36.6,36.0,35.5,35.1,34.7,34.4,34.0,33.5,33.3,32.8,32.6,32.2,32.0,31.7,31.7,31.6,31.4,31.3,31.2,31.0,30.9,30.9,30.8],"100_30_MID":[81.8,79.6,77.1,74.9,72.5,70.0,67.5,64.9,62.3,59.8,57.4,55.3,53.2,51.3,49.7,48.2,46.9,45.6,44.4,43.4,42.2,41.3,40.5,39.7,39.2,38.6,38.1,37.4,37.1,36.7,36.3,35.8,35.4,35.0,34.8,34.4,34.0,33.7,33.6,33.3,33.1,33.0,32.8,32.7,32.5,32.5,32.3,32.3,32.2,32.1,32.0],"100_30_OFF":[83.8,81.9,80.0,78.5,76.9,75.2,73.4,71.6,69.7,67.8,65.9,64.2,62.6,61.0,59.5,58.1,56.6,55.2,54.0,52.8,51.7,50.8,49.8,48.8,47.8,46.9,46.2,45.3,44.9,44.2,43.7,43.1,42.7,42.2,41.8,41.4,41.0,40.6,40.1,39.8,39.4,39.1,39.0,38.6,38.5,38.3,38.2,37.9,37.7,37.5,37.3],"100_30_ON":[77.9,75.9,74.1,71.9,69.9,67.7,65.4,63.2,60.9,58.7,56.3,54.1,52.0,50.2,48.6,47.1,45.8,44.6,43.5,42.3,41.2,40.2,39.5,38.6,38.0,37.4,36.8,36.0,35.6,35.0,34.6,34.2,33.8,33.3,33.0,32.6,32.3,31.9,31.8,31.6,31.2,31.0,30.8,30.7,30.4,30.4,30.1,30.1,30.1,29.9,29.9],"100_40_MID":[79.4,77.2,74.8,72.6,70.2,67.8,65.5,63.2,60.6,58.6,56.6,54.6,53.0,51.5,49.9,48.5,47.2,45.9,44.8,43.8,42.6,41.7,41.0,40.2,39.7,38.9,38.4,37.8,37.2,36.8,36.4,35.8,35.4,35.1,34.7,34.4,34.0,34.0,33.6,33.4,33.3,33.2,32.9,32.7,32.6,32.5,32.5,32.4,32.3,32.3,32.2],"100_40_OFF":[81.9,80.1,78.1,76.3,74.3,72.3,70.1,68.0,66.0,63.9,61.9,59.8,58.0,56.2,54.6,53.1,51.6,50.3,49.0,48.0,46.8,45.9,45.1,44.3,43.5,42.8,42.1,41.5,41.0,40.5,40.0,39.4,39.2,38.7,38.1,38.0,37.6,37.3,36.9,36.7,36.5,36.2,35.9,35.7,35.5,35.4,35.1,35.0,34.9,34.8,34.6],"100_40_ON":[79.7,77.6,75.3,72.8,70.4,67.9,65.3,62.7,60.2,58.0,55.7,53.4,51.5,49.6,48.1,46.4,45.1,44.0,42.8,41.7,40.8,39.8,38.9,38.0,37.3,36.8,36.0,35.4,35.0,34.6,34.0,33.5,33.2,33.0,32.6,32.2,32.1,31.7,31.7,31.5,31.4,31.4,31.0,30.9,30.7,30.5,30.5,30.2,30.2,30.1,30.2],"110_20_MID":[89.0,86.6,84.3,81.8,79.1,76.3,73.5,70.8,68.1,65.3,62.6,59.7,57.5,55.5,53.5,51.7,49.9,48.4,47.1,45.8,44.6,43.6,42.6,41.7,40.9,40.2,39.5,39.0,38.3,38.0,37.4,36.9,36.5,36.1,35.8,35.6,35.2,34.9,34.6,34.4,34.1,33.9,33.7,33.5,33.3,33.1,33.1,32.9,32.8,32.7,32.5],"110_20_ON":[90.0,87.4,84.2,81.1,78.1,75.0,72.7,70.3,67.9,65.5,63.0,60.4,57.9,55.8,53.7,51.8,50.3,49.0,47.4,46.5,45.4,44.7,43.8,43.2,42.5,41.9,41.1,40.4,39.7,39.3,38.8,38.5,38.1,37.8,37.4,36.9,36.6,36.2,35.9,35.6,35.4,35.2,35.0,34.8,34.6,34.5,34.3,34.3,34.1,33.9,33.7],"110_30_MID":[91.9,89.3,86.8,84.2,81.6,78.9,76.2,73.4,70.3,67.1,64.2,62.1,60.2,58.4,56.4,54.8,53.1,51.5,50.0,48.6,47.5,46.6,45.6,44.7,43.7,42.7,42.1,41.3,40.9,40.4,39.9,39.3,38.9,38.5,37.9,37.3,37.0,36.7,36.5,36.2,35.9,35.7,35.3,35.1,34.9,34.7,34.6,34.5,34.4,34.4,34.1],"110_30_OFF":[91.9,89.9,87.9,85.7,83.5,81.3,78.9,76.7,74.6,72.5,70.2,68.4,66.5,64.5,62.7,61.1,59.7,58.4,57.1,55.7,54.9,53.9,52.9,51.9,50.9,49.8,48.9,48.1,47.4,46.8,46.4,45.8,45.4,44.9,44.5,43.9,43.5,42.9,42.4,41.9,41.5,41.3,41.1,40.9,40.7,40.5,40.3,40.0,39.8,39.5,39.4],"110_30_ON":[90.8,88.6,86.1,83.5,80.7,77.9,75.5,72.6,70.1,67.4,64.7,62.5,60.4,58.2,55.7,53.4,51.2,49.6,48.3,47.1,46.0,44.8,43.8,42.7,41.8,41.3,40.4,39.8,39.2,38.7,37.9,37.4,36.9,36.4,35.9,35.5,35.2,34.8,34.4,34.3,34.0,33.8,33.6,33.3,33.1,32.8,32.6,32.5,32.3,32.3,32.0],"110_40_MID":[93.4,91.0,88.5,85.7,82.6,80.1,77.6,75.1,72.3,69.5,66.8,63.9,61.2,58.8,56.9,55.2,53.8,52.3,51.1,49.8,48.3,47.3,46.0,45.0,44.1,43.2,42.4,41.8,41.2,40.8,40.3,39.7,39.3,38.8,38.4,37.8,37.5,37.2,36.9,36.7,36.5,36.3,36.1,36.1,35.9,35.7,35.7,35.5,35.6,35.4,35.2],"110_40_OFF":[92.2,90.2,87.7,85.5,83.0,80.5,78.1,75.7,73.1,70.7,68.4,66.4,64.5,62.6,60.8,59.2,57.7,56.3,54.9,53.7,52.5,51.5,50.5,49.6,48.7,48.0,47.2,46.7,46.0,45.4,44.9,44.4,43.8,43.4,43.1,42.6,42.3,42.0,41.6,41.3,41.0,40.7,40.5,40.2,40.0,39.7,39.5,39.3,39.0,38.9,38.8],"110_40_ON":[89.1,86.8,84.3,81.6,78.9,76.1,73.4,70.6,67.7,64.8,61.9,59.7,57.4,55.4,53.6,51.8,50.2,48.7,47.2,45.9,44.8,43.6,42.6,41.7,40.7,39.8,39.4,38.7,38.1,37.8,37.2,36.6,36.2,35.8,35.3,35.0,34.6,34.3,34.0,33.7,33.4,33.2,33.0,32.8,32.6,32.4,32.3,32.2,31.9,32.0,31.8]},"n":{"90_20_MID":3,"90_20_OFF":3,"90_20_ON":3,"90_30_MID":3,"90_30_OFF":3,"90_30_ON":3,"90_40_MID":3,"90_40_OFF":3,"90_40_ON":3,"100_20_MID":3,"100_20_OFF":3,"100_20_ON":3,"100_30_MID":3,"100_30_OFF":3,"100_30_ON":3,"100_40_MID":3,"100_40_OFF":3,"100_40_ON":3,"110_20_MID":3,"110_20_ON":3,"110_30_MID":3,"110_30_OFF":3,"110_30_ON":3,"110_40_MID":3,"110_40_OFF":3,"110_40_ON":3},"D":{"90_20_OFF":0.379,"90_20_MID":0.386,"90_20_ON":0.388,"90_30_OFF":0.407,"90_30_MID":0.333,"90_30_ON":0.391,"90_40_OFF":0.373,"90_40_MID":0.338,"90_40_ON":0.316,"100_20_OFF":0.444,"100_20_MID":0.468,"100_20_ON":0.463,"100_30_OFF":0.334,"100_30_MID":0.379,"100_30_ON":0.363,"100_40_OFF":0.266,"100_40_MID":0.33,"100_40_ON":0.283,"110_20_OFF":null,"110_20_MID":0.571,"110_20_ON":0.475,"110_30_OFF":0.362,"110_30_MID":0.433,"110_30_ON":0.442,"110_40_OFF":0.404,"110_40_MID":0.407,"110_40_ON":0.393},"loco":2.25,"SP":[3.993981, 0.137397, 0.01123, 0.043361, 0.434967, 0.057255, 0.005854, -0.010826, 0.975193, 0.30254, 0.000699, -1.050396],"Tb":26.158,"dloo":0.046,"dsd":0.104};
+const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
+function el(tag,attrs,txt){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(txt!=null)e.textContent=txt;return e}
+const FN=['Off','Mid','On'], FK=['OFF','MID','ON'];
+const st={T:100,R:30,F:1,probe:null,pins:[],sd:1};
+const RAMP=[[0,70,90,200],[.25,130,60,170],[.5,200,50,110],[.72,245,110,40],[.9,252,190,50],[1,255,245,170]];
+function ramp(u){u=Math.max(0,Math.min(1,u));for(let i=1;i<RAMP.length;i++){if(u<=RAMP[i][0]){const a=RAMP[i-1],b=RAMP[i],k=(u-a[0])/(b[0]-a[0]);return `rgb(${Math.round(a[1]+(b[1]-a[1])*k)},${Math.round(a[2]+(b[2]-a[2])*k)},${Math.round(a[3]+(b[3]-a[3])*k)})`}}return 'rgb(255,245,170)'}
+const tCol=T=>ramp((T-24)/81);
+const x4=(t,r,f)=>[1,(t-100)/10,(r-30)/10,f-1];
+function semiPar(t,r,f){const z=[(t-100)/10,(r-30)/10,f-1],p=DATA.SP,g=o=>p[o]+p[o+1]*z[0]+p[o+2]*z[1]+p[o+3]*z[2];return{a:Math.exp(g(0)),L:Math.exp(g(4)),c:Math.exp(g(8))}}
+function semiRaw(t,r,f,x){const q=semiPar(t,r,f);return DATA.Tb+q.a*Math.exp(-x/q.L)+q.c}
+function predict(t,r,f){let m=1e9;return Array.from({length:101},(_,j)=>{const v=Math.max(semiRaw(t,r,f,j*0.05),24);m=Math.min(m,v);return m})}
+function diam(t,r,f){const x=x4(t,r,f);let z=0;for(let k=0;k<4;k++)z+=x[k]*DATA.Bd[k];return Math.exp(z)}
+const GS=0.05, Tat=(p,s)=>{const q=s/GS,i=Math.min(Math.floor(q),p.length-2);return p[i]+(p[i+1]-p[i])*(q-i)};
+const Y0=164, PXCM=46, yOf=s=>Y0+PXCM*s;
+
+// scene setup
+const fiber=$('fiber'),halo=$('halo');
+const segs=[];for(let i=0;i<50;i++){for(const g of [fiber,halo]){const r=document.createElementNS(NS,'rect');r.setAttribute('y',yOf(i*.1));r.setAttribute('height',PXCM*.1+.6);g.appendChild(r);(g===fiber?segs:segs).push(r)}}
+const ruler=$('ruler');for(let c=0;c<=5;c++){const l=document.createElementNS(NS,'path');l.setAttribute('d',`M262 ${yOf(c)}H400`);l.setAttribute('stroke-dasharray','2 5');l.setAttribute('stroke-opacity','.5');l.setAttribute('stroke','var(--muted)');ruler.appendChild(l);const t=document.createElementNS(NS,'text');t.setAttribute('x',406);t.setAttribute('y',yOf(c)+3.5);t.textContent=c+' cm';ruler.appendChild(t)}
+// air puffs
+const air=$('air'),puffs=[];
+[[-1,214],[1,306]].forEach(([dir,x0])=>{for(let i=0;i<7;i++){const p=document.createElementNS(NS,'path');p.setAttribute('d',`M0 0 q${-dir*-9} -4 ${-dir*-18} 0`);p.setAttribute('transform',`translate(${x0} ${228+i*8})`);p.setAttribute('stroke','var(--accent)');p.setAttribute('stroke-width','2');p.setAttribute('stroke-linecap','round');p.setAttribute('fill','none');p.classList.add('puff');p.dataset.i=i;p.dataset.dir=dir;air.appendChild(p);puffs.push(p)}});
+function setAir(level){puffs.forEach(p=>{const i=+p.dataset.i,dir=+p.dataset.dir;const show=level>0&&(level===2||i%2===0);p.style.display=show?'':'none';const dur=level===2?0.8:1.6;p.style.setProperty('--dur',dur+'s');p.style.animationDelay=(i*dur/7)+'s';p.style.setProperty('--dx',(dir>0?-34:34)+'px');p.setAttribute('stroke-opacity',level===2?.9:.6)})}
+const vanes=[];[['ledL',[[200,214,232,250],[210,232,228,262]],0],['ledR',[[320,214,288,250],[310,232,292,262]],0]].forEach(([id,L])=>{L.forEach(([x1,y1,x2,y2])=>{const l=el('line',{x1,y1,x2,y2,stroke:'var(--metal)','stroke-width':3,'stroke-linecap':'round'});l.classList.add('vane');$(id).appendChild(l);vanes.push(l)})});
+function setFans(level){vanes.forEach((v,i)=>{v.style.animation=level?`pulse ${level===2?.3:.8}s ease-in-out infinite`:'none';v.style.animationDelay=(i*.07)+'s';v.style.opacity=level?'':'.35'})}
+// chart
+const CW=660,CH=300,M={l:46,r:14,t:12,b:36},X0=M.l,X1=CW-M.r,Y1=CH-M.b,Y_0=M.t;
+const xs=s=>X0+(X1-X0)*s/5, ys=T=>Y1-(Y1-Y_0)*(T-20)/(110-20);
+const ch=$('chart');
+const key=(t,r,f)=>`${t}_${r}_${FK[f]}`;
+function drawChart(p,bandSd){
+ ch.replaceChildren();
+ for(let T=20;T<=110;T+=10){ch.appendChild(el('line',{x1:X0,x2:X1,y1:ys(T),y2:ys(T),stroke:'var(--line)'}));ch.appendChild(el('text',{x:X0-6,y:ys(T)+4,'text-anchor':'end','font-size':11,fill:'var(--muted)','font-family':'JetBrains Mono'},T))}
+ for(let s=0;s<=5;s++){ch.appendChild(el('text',{x:xs(s),y:Y1+16,'text-anchor':'middle','font-size':11,fill:'var(--muted)','font-family':'JetBrains Mono'},s));}
+ ch.appendChild(el('text',{x:(X0+X1)/2,y:CH-4,'text-anchor':'middle','font-size':11.5,fill:'var(--muted)'},'distance from nozzle tip (cm)'));
+ ch.appendChild(el('text',{transform:`translate(12 ${(Y1+Y_0)/2}) rotate(-90)`,'text-anchor':'middle','font-size':11.5,fill:'var(--muted)'},'apparent temperature (°C)'));
+ const pts=a=>a.map((v,j)=>`${xs(j*GS).toFixed(1)},${ys(v).toFixed(1)}`);
+ // band
+ const up=p.map((v,j)=>[xs(j*GS),ys(Math.min(110,v+bandSd[j]))]),lo=p.map((v,j)=>[xs(j*GS),ys(Math.max(20,v-bandSd[j]))]).reverse();
+ ch.appendChild(el('polygon',{points:[...up,...lo].map(a=>a.join(',')).join(' '),fill:'var(--accent)','fill-opacity':.14}));
+ // measured conditions (faint) + exact
+ const ex=key(st.T,st.R,st.F);
+ if($('showAll').checked)for(const k in DATA.means){if(k===ex)continue;ch.appendChild(el('polyline',{points:DATA.means[k].map((v,j)=>v==null?null:`${xs(j*.1).toFixed(1)},${ys(v).toFixed(1)}`).filter(Boolean).join(' '),fill:'none',stroke:'var(--muted)','stroke-opacity':.22,'stroke-width':1}))}
+ st.pins.forEach((q,i)=>{ch.appendChild(el('polyline',{points:pts(q.p).join(' '),fill:'none',stroke:['#f59e0b','#10b981','#ef4444','#3b82f6'][i%4],'stroke-width':2,'stroke-dasharray':'6 4'}))});
+ if(DATA.means[ex]){DATA.means[ex].forEach((v,j)=>{if(v!=null)ch.appendChild(el('circle',{cx:xs(j*.1),cy:ys(v),r:2.8,fill:'var(--ink)'}))})}
+ ch.appendChild(el('polyline',{points:pts(p).join(' '),fill:'none',stroke:'var(--accent)','stroke-width':3,'stroke-linejoin':'round'}));
+ if(st.cur!=null){const s=st.cur,T=Tat(p,s);ch.appendChild(el('line',{x1:xs(s),x2:xs(s),y1:Y_0,y2:Y1,stroke:'var(--accent)','stroke-dasharray':'3 3'}));ch.appendChild(el('circle',{cx:xs(s),cy:ys(T),r:5,fill:'var(--accent)'}));const lx=Math.min(xs(s)+8,X1-120);ch.appendChild(el('text',{x:lx,y:ys(T)-10,'font-size':12,fill:'var(--ink)','font-family':'JetBrains Mono','font-weight':500},`${s.toFixed(2)} cm · ${T.toFixed(1)} °C`))}
+ const lg=$('clegend');lg.replaceChildren();
+ const add=(c,t)=>{const s=document.createElement('span');s.innerHTML=`<span class="dot" style="background:${c}"></span>${t}`;lg.appendChild(s)};
+ add('var(--accent)','Prediction ± 1 RMSE band');
+ if(DATA.means[ex])add('var(--ink)',`Measured mean (${DATA.n[ex]} photo${DATA.n[ex]>1?'s':''})`);else add('var(--muted)','No photo at exactly this setting: interpolated');
+ st.pins.forEach((q,i)=>add(['#f59e0b','#10b981','#ef4444','#3b82f6'][i%4],q.label));
+}
+function chartPos(e){const r=ch.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*CW;return Math.max(0,Math.min(5,(x-X0)/(X1-X0)*5))}
+ch.addEventListener('pointermove',e=>{st.probe=chartPos(e);render()});
+const sc=$('scene'),hit=$('hit');
+function scenePos(e){const pt=sc.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(sc.getScreenCTM().inverse());return Math.max(0,Math.min(5,(q.y-Y0)/PXCM))}
+hit.addEventListener('pointermove',e=>{st.hover=scenePos(e);render()});
+hit.addEventListener('pointerleave',()=>{st.hover=null;render()});
+hit.addEventListener('click',e=>{const s=scenePos(e);st.fixed=(st.fixed!=null&&Math.abs(st.fixed-s)<0.12)?null:s;render()});
+ch.addEventListener('click',e=>{st.fixed=chartPos(e);render()});
+ch.addEventListener('pointerleave',()=>{st.probe=null;render()});
+
+function render(){
+ const {T,R,F}=st, p=predict(T,R,F), d=diam(T,R,F), v=2*Math.PI*0.765*R/60;
+ $('Tv').textContent=T+' °C';$('Rv').textContent=R+' rpm';$('Fv').textContent=FN[F];
+ document.querySelectorAll('#F button').forEach(b=>b.classList.toggle('on',+b.dataset.f===F));
+ // nozzle
+ const nc=ramp(.42+(T-90)/20*.36);$('nozzle').setAttribute('fill',nc);$('glowN').setAttribute('fill',nc);$('glowN').setAttribute('opacity',.25+(T-90)/20*.5);
+ $('nozT').textContent=T+' °C';$('nozTxt').setAttribute('fill',T>=104?'#3a1200':'#fff');$('nozT').setAttribute('fill',T>=104?'#3a1200':'#fff');
+ // fiber
+ const w=2+d*10;
+ for(let i=0;i<50;i++){const c=tCol(Tat(p,i*.1+.05));for(const k of [2*i,2*i+1]){const r=segs[k];r.setAttribute('fill',c);r.setAttribute('x',260-(k%2?w*1.8:w)/2);r.setAttribute('width',k%2?w*1.8:w)}}
+ // fan, spool
+ setAir(F);setFans(F);
+ $('spoolTxt').textContent=`spool ${R} rpm · ${v.toFixed(2)} cm/s · traverses ↔`;
+ $('dTag').textContent=`d ≈ ${d.toFixed(2)} mm`;
+ // probe on fiber
+ st.cur=st.probe??st.hover??st.fixed;const pr=$('probe'),co=$('callout');$('probeT').textContent='';
+ if(st.cur!=null){const s=st.cur,Tp=Tat(p,s);pr.style.display='';pr.setAttribute('transform',`translate(260 ${yOf(s)})`);co.style.display='';const cy=Math.max(20,Math.min(yOf(s)-33,330)),cx=300;$('cbox').setAttribute('x',cx);$('cbox').setAttribute('y',cy);
+  for(const [id,y,t] of [['c1',19,`${s.toFixed(2)} cm from tip`],['c2',42,`${Tp.toFixed(1)} °C`],['c3',58,`${(s/v).toFixed(2)} s after nozzle · ±${DATA.sd[Math.round(s/GS)]}`]]){const e=$(id);e.setAttribute('x',cx+10);e.setAttribute('y',cy+y);e.textContent=t}
+  const ln=$('cline');ln.setAttribute('x1',266);ln.setAttribute('y1',yOf(s));ln.setAttribute('x2',cx);ln.setAttribute('y2',cy+33)}else{pr.style.display='none';co.style.display='none'}
+ // kpis
+ $('kD').textContent=d.toFixed(2)+' mm';$('kV').textContent=v.toFixed(2)+' cm/s';$('kP').textContent=Tat(p,.2).toFixed(0)+' °C';
+ const bg=25,ex0=Tat(p,.2)-bg;let sh=null,s40=null;for(let j=4;j<p.length;j++){if(sh==null&&p[j]-bg<=ex0/2)sh=j*GS;if(s40==null&&p[j]<40)s40=j*GS}
+ $('kH').textContent=sh==null?'> 5 cm':sh.toFixed(2)+' cm';$('k40').textContent=s40==null?'> 5 cm':s40.toFixed(2)+' cm';$('kt').textContent=(1/v).toFixed(2)+' s';
+ // status
+ const ex=key(T,R,F),meas=DATA.means[ex];
+ let h;if(T===110&&R===20&&F===0)h='<span class="badge b-warn">Not measured</span> 110 °C · 20 rpm · Off had no photos: pure interpolation.';
+ else if(meas){let e=0,c=0;meas.forEach((m,j)=>{if(m!=null){e+=(Tat(p,j*.1)-m)**2;c++}});h=`<span class="badge b-ok">Measured condition</span> ${DATA.n[ex]} photo${DATA.n[ex]>1?'s':''}; model vs. measured mean: RMSE ${Math.sqrt(e/c).toFixed(1)} °C.`}
+ else h='<span class="badge b-warn">Interpolated</span> Between measured settings (grid: 90/100/110 °C, 20/30/40 rpm).';
+ $('status').innerHTML=h;
+ // effects
+ const s=st.sd;$('sdv').textContent=s.toFixed(1)+' cm';const j=Math.round(s/GS);const R0=(t,r,f)=>semiRaw(t,r,f,s);const B=[0,R0(st.T+10,st.R,st.F)-R0(st.T,st.R,st.F),R0(st.T,st.R+10,st.F)-R0(st.T,st.R,st.F),R0(st.T,st.R,1)-R0(st.T,st.R,0),R0(st.T,st.R,2)-R0(st.T,st.R,0)];
+ const rows=[['Nozzle +10 °C',B[1]],['Spool +10 rpm',B[2]],['Fans Off → Mid',B[3]],['Fans Off → On',B[4]]];
+ $('eff').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]>=0?'+':''}${r[1].toFixed(1)} °C</td></tr>`).join('');
+ $('qA').textContent='≈ '+DATA.loco+' °C';$('qD').textContent='≈ '+DATA.dloo+' mm';
+ drawChart(p,DATA.sd);
+ renderEq(p,d,v,sh,B);drawHeat();drawFan();
+}
+['T','R'].forEach(id=>$(id).addEventListener('input',e=>{st[id]=+e.target.value;render()}));
+$('sd').addEventListener('input',e=>{st.sd=+e.target.value;render()});
+document.querySelectorAll('#F button').forEach(b=>b.addEventListener('click',()=>{st.F=+b.dataset.f;render()}));
+$('showAll').addEventListener('change',render);
+$('pin').addEventListener('click',()=>{if(st.pins.length>=4)st.pins.shift();st.pins.push({p:predict(st.T,st.R,st.F),label:`${st.T} °C · ${st.R} rpm · ${FN[st.F]}`});render()});
+$('clear').addEventListener('click',()=>{st.pins=[];render()});
+$('copy').addEventListener('click',async()=>{const p=predict(st.T,st.R,st.F);let t=`# TRACE FrED twin: T=${st.T}C rpm=${st.R} fan=${FN[st.F]} d_mm=${diam(st.T,st.R,st.F).toFixed(3)}\ndistance_cm,apparent_T_C,band_C\n`;p.forEach((v,j)=>t+=`${(j*GS).toFixed(2)},${v.toFixed(1)},${DATA.sd[j]}\n`);const b=$('copy');try{await navigator.clipboard.writeText(t);b.textContent='Copied ✓'}catch(e){b.textContent='Copy blocked';}setTimeout(()=>b.textContent='Copy curve as CSV',1600)});
+$('theme').addEventListener('click',()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark'});
+
+
+// ---- operating map
+const HM={l:46,r:78,t:10,b:38,W:660,H:330},NC=21,cw=(HM.W-HM.l-HM.r)/NC,chh=(HM.H-HM.t-HM.b)/NC;
+const hmSvg=$('heat');let hmKey='',hmRange=[0,1];
+function metricAt(kind,t,r,f){if(kind==='d')return diam(t,r,f);const p=predict(t,r,f);if(kind==='T')return Tat(p,st.sd);const ex0=Tat(p,.2)-25;for(let j=4;j<p.length;j++)if(p[j]-25<=ex0/2)return j*GS;return 5}
+const hmFmt={T:v=>v.toFixed(0)+' °C',d:v=>v.toFixed(2)+' mm',L:v=>v.toFixed(2)+' cm'};
+function drawHeat(){
+ const kind=$('hm').value,key=kind+st.F+(kind==='T'?st.sd:'');
+ $('hmDist').textContent=kind==='T'?`distance: ${st.sd.toFixed(1)} cm (set with the slider below)`:'';
+ if(key!==hmKey){hmKey=key;hmSvg.replaceChildren();const vals=[];for(let a=0;a<NC;a++)for(let b2=0;b2<NC;b2++)vals.push(metricAt(kind,90+(NC-1-b2),20+a,st.F));
+  const lo=Math.min(...vals),hi=Math.max(...vals);hmRange=[lo,hi];let i=0;
+  for(let a=0;a<NC;a++)for(let b2=0;b2<NC;b2++){const v=vals[i++];const u=(v-lo)/(hi-lo||1);hmSvg.appendChild(el('rect',{x:HM.l+a*cw,y:HM.t+b2*chh,width:cw+.5,height:chh+.5,fill:ramp(kind==='d'||kind==='L'?u:u)}))}
+  for(let r=20;r<=40;r+=10)hmSvg.appendChild(el('text',{x:HM.l+(r-20+.5)*cw,y:HM.H-20,'text-anchor':'middle','font-size':11,fill:'var(--muted)','font-family':'JetBrains Mono'},r));
+  hmSvg.appendChild(el('text',{x:HM.l+(HM.W-HM.l-HM.r)/2,y:HM.H-4,'text-anchor':'middle','font-size':11.5,fill:'var(--muted)'},'spool speed (rpm)'));
+  for(let t=90;t<=110;t+=10)hmSvg.appendChild(el('text',{x:HM.l-6,y:HM.t+(110-t+.5)*chh+4,'text-anchor':'end','font-size':11,fill:'var(--muted)','font-family':'JetBrains Mono'},t));
+  hmSvg.appendChild(el('text',{transform:`translate(12 ${HM.t+(HM.H-HM.t-HM.b)/2}) rotate(-90)`,'text-anchor':'middle','font-size':11.5,fill:'var(--muted)'},'nozzle (°C)'));
+  [90,100,110].forEach(t=>[20,30,40].forEach(r=>{const has=DATA.means[key2(t,r,st.F)];hmSvg.appendChild(el('circle',{cx:HM.l+(r-20+.5)*cw,cy:HM.t+(110-t+.5)*chh,r:4,fill:'none',stroke:has?'#fff':'#fff','stroke-opacity':has?.95:.35,'stroke-width':1.4,'stroke-dasharray':has?'':'2 2'}))}));
+  // colorbar
+  const gx=HM.W-HM.r+18;for(let k=0;k<40;k++)hmSvg.appendChild(el('rect',{x:gx,y:HM.t+k*(HM.H-HM.t-HM.b)/40,width:14,height:(HM.H-HM.t-HM.b)/40+.5,fill:ramp(1-k/39)}));
+  hmSvg.appendChild(el('text',{x:gx+20,y:HM.t+10,'font-size':11,fill:'var(--muted)','font-family':'JetBrains Mono'},hmFmt[kind](hi)));hmSvg.appendChild(el('text',{x:gx+20,y:HM.H-HM.b,'font-size':11,fill:'var(--muted)','font-family':'JetBrains Mono'},hmFmt[kind](lo)));
+  hmSvg.appendChild(el('g',{id:'hmMark'}));hmSvg.appendChild(el('text',{id:'hmTip','font-size':12,'font-weight':600,fill:'#fff','font-family':'JetBrains Mono','paint-order':'stroke',stroke:'#000','stroke-width':3}));
+ }
+ const g=hmSvg.querySelector('#hmMark');if(g){g.replaceChildren();const cx=HM.l+(st.R-20+.5)*cw,cy=HM.t+(110-st.T+.5)*chh;g.appendChild(el('circle',{cx,cy,r:8,fill:'none',stroke:'#fff','stroke-width':3}));g.appendChild(el('circle',{cx,cy,r:8,fill:'none',stroke:'var(--accent)','stroke-width':1.5}));
+  const v=metricAt(kind,st.T,st.R,st.F);const tx=el('text',{x:Math.min(cx+12,HM.W-HM.r-90),y:cy-12,'font-size':12,'font-weight':600,fill:'#fff',stroke:'#000','stroke-width':3,'paint-order':'stroke','font-family':'JetBrains Mono'},hmFmt[kind](v));g.appendChild(tx)}
+}
+function key2(t,r,f){return `${t}_${r}_${FK[f]}`}
+function hmPos(e){const r=hmSvg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*HM.W,y=(e.clientY-r.top)/r.height*HM.H;const a=Math.floor((x-HM.l)/cw),b2=Math.floor((y-HM.t)/chh);if(a<0||a>=NC||b2<0||b2>=NC)return null;return [90+(NC-1-b2),20+a]}
+hmSvg.addEventListener('pointermove',e=>{const q=hmPos(e);$('hmInfo').textContent=q?`${q[0]} °C · ${q[1]} rpm · fans ${FN[st.F]}: ${hmFmt[$('hm').value](metricAt($('hm').value,q[0],q[1],st.F))}  (click to select)`:'Click the map to jump to that setting. Open circles = measured settings.'});
+hmSvg.addEventListener('click',e=>{const q=hmPos(e);if(!q)return;st.T=q[0];st.R=q[1];$('T').value=q[0];$('R').value=q[1];render()});
+$('hm').addEventListener('change',render);
+// ---- fan effect
+const fc=$('fanc'),FCOL=['#8794a0','#f59e0b','#10b981'];
+function drawFan(){
+ fc.replaceChildren();const H=300;
+ for(let T=20;T<=110;T+=10){fc.appendChild(el('line',{x1:X0,x2:X1,y1:ys(T)*H/CH,y2:ys(T)*H/CH,stroke:'var(--line)'}));fc.appendChild(el('text',{x:X0-6,y:ys(T)*H/CH+4,'text-anchor':'end','font-size':11,fill:'var(--muted)','font-family':'JetBrains Mono'},T))}
+ for(let s=0;s<=5;s++)fc.appendChild(el('text',{x:xs(s),y:H-38*0-20,'text-anchor':'middle','font-size':11,fill:'var(--muted)','font-family':'JetBrains Mono'},s));
+ fc.appendChild(el('text',{x:(X0+X1)/2,y:H-4,'text-anchor':'middle','font-size':11.5,fill:'var(--muted)'},'distance from nozzle tip (cm)'));
+ fc.appendChild(el('line',{x1:xs(st.sd),x2:xs(st.sd),y1:12*H/CH,y2:(CH-M.b)*H/CH,stroke:'var(--muted)','stroke-dasharray':'3 3'}));
+ const P=[0,1,2].map(f=>predict(st.T,st.R,f)),lg=$('fanLeg');lg.replaceChildren();
+ [0,1,2].forEach(f=>{const p=P[f];fc.appendChild(el('polyline',{points:p.map((v,j)=>`${xs(j*GS).toFixed(1)},${(ys(v)*H/CH).toFixed(1)}`).join(' '),fill:'none',stroke:FCOL[f],'stroke-width':f===st.F?3.6:1.8,'stroke-opacity':f===st.F?1:.8,'stroke-linejoin':'round'}));
+  const m=DATA.means[key2(st.T,st.R,f)];if(m)m.forEach((v,j)=>{if(v!=null)fc.appendChild(el('circle',{cx:xs(j*.1),cy:ys(v)*H/CH,r:2.2,fill:FCOL[f]}))});
+  const s=document.createElement('span');s.innerHTML=`<span class="dot" style="background:${FCOL[f]}"></span>Fans ${FN[f]}${m?` (dots: measured, ${DATA.n[key2(st.T,st.R,f)]} photos)`:' (no photos)'}`;lg.appendChild(s)});
+ const a=Tat(P[0],st.sd),m2=Tat(P[1],st.sd),c=Tat(P[2],st.sd);
+ $('fanTxt').textContent=`At ${st.sd.toFixed(1)} cm: Off ${a.toFixed(1)} °C · Mid ${m2.toFixed(1)} °C · On ${c.toFixed(1)} °C, so fans On vs Off change it by ${(c-a>=0?'+':'')+(c-a).toFixed(1)} °C. The model assumes Mid sits halfway between Off and On; the dots show what was really measured, which is not always evenly spaced (here Mid and On are almost equal and both sit clearly below Off).`;
+}
+// spool animation: rotation (stripes) + traverse
+let ph=0,tt=0,last=performance.now();
+function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;tt+=dt;ph+=dt*st.R/60*2*Math.PI*20*0.5;
+ const sx=330+30*Math.sin(tt*2*Math.PI/6);$('spoolG').setAttribute('transform',`translate(${sx} 640)`);
+ $('toSpool').setAttribute('d',`M260 600 L${sx} 640`);$('stripes').setAttribute('patternTransform',`translate(0 ${(ph%12).toFixed(2)})`);requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+// equations
+const RHO=1200,CP=1300,KSIL=0.2,RS=0.765;
+let mjReady=false,lastEq=null;
+function renderEq(p,d,v,sh,B){lastEq=[p,d,v,sh,B];if(!mjReady)return;
+ const f2=x=>x.toFixed(2),f3=x=>x.toFixed(3),sg=x=>x<0?`-${Math.abs(x).toFixed(2)}`:`+${x.toFixed(2)}`;
+ const L=(sh||5)/Math.LN2/100,dm=d/1000,vm=v/100,h=RHO*CP*dm*vm/(4*L),Bi=h*dm/(2*KSIL),tau=L/vm;
+ const d30=diam(st.T,30,st.F),dideal=d30*Math.sqrt(30/st.R),j=Math.round(st.sd/GS),pv=Tat(p,st.sd);
+ const tn=((st.T-100)/10).toFixed(1),rn=((st.R-30)/10).toFixed(1),fn=st.F-1;
+ const lnd=DATA.Bd[0]+DATA.Bd[1]*(st.T-100)/10+DATA.Bd[2]*(st.R-30)/10+DATA.Bd[3]*fn;
+ const tdef=String.raw`\\ \tilde t=\tfrac{T_{noz}-100}{10},\ \ \tilde r=\tfrac{\mathrm{rpm}-30}{10},\ \ \tilde f=\mathrm{fan}-1\ \ (\mathrm{Off}{=}-1,\mathrm{Mid}{=}0,\mathrm{On}{=}+1)`;
+ const E=[
+ ['1 · Fiber speed',String.raw`v=\dfrac{2\pi R\,\omega}{60}`,String.raw`v=\dfrac{2\pi\cdot${RS}\cdot${st.R}}{60}=\mathbf{${f2(v)}}\ \mathrm{cm/s}`,'R = spool radius (0.765 cm), ω in rpm. The left-right traverse does not change v.'],
+ ['2 · Mass conservation',String.raw`\dot m=\rho\,\dfrac{\pi d^{2}}{4}\,v=\mathrm{const}\;\Rightarrow\;d\propto v^{-1/2}`,String.raw`d_{ideal}=d_{30}\sqrt{\tfrac{30}{\omega}}=${f3(dideal)}\ \mathrm{mm},\quad d_{fit}=\mathbf{${f3(d)}}\ \mathrm{mm}`,'Measured d ∝ rpm^−0.4 (FrED camera, 25 conditions), a bit shallower than the −½ that constant volume flow predicts.'],
+ ['3 · Energy balance',String.raw`\rho c_p\,\dfrac{\pi d^{2}}{4}\,v\,\dfrac{dT}{dx}=-h\,\pi d\,(T-T_\infty)`,String.raw`\Rightarrow\ T(x)=T_\infty+(T_0-T_\infty)\,e^{-x/L}`,'Convection only; radiation and conduction along the fiber are neglected.'],
+ ['4 · Cooling length',String.raw`L=\dfrac{\rho c_p\,d\,v}{4h}`,String.raw`L_{eff}=\dfrac{s_{1/2}}{\ln 2}=\mathbf{${f2((sh||5)/Math.LN2)}}\ \mathrm{cm}`,'s½ is read from the predicted curve: the distance where the excess over ambient halves.'],
+ ['5 · Effective heat-transfer coefficient',String.raw`h=\dfrac{\rho c_p\,d\,v}{4L}`,String.raw`h=\dfrac{${RHO}\cdot${CP}\cdot${(dm*1e3).toFixed(3)}\!\times\!10^{-3}\cdot${f3(vm)}}{4\cdot${(L*1e3).toFixed(1)}\!\times\!10^{-3}}=\mathbf{${Math.round(h)}}\ \mathrm{W/m^2K}`,'ρ = 1200 kg/m³, cₚ = 1300 J/kg·K. Orientative: the camera sees a sub-pixel fiber, so h is probably overestimated.'],
+ ['6 · Lumped-capacitance check',String.raw`\mathrm{Bi}=\dfrac{h\,d}{2k}\ll 1,\qquad \tau=\dfrac{L}{v}`,String.raw`\mathrm{Bi}=\dfrac{${Math.round(h)}\cdot${dm.toExponential(1).replace('e-','\\!\\times\\!10^{-')}}}{2\cdot${KSIL}}=\mathbf{${f2(Bi)}},\quad \tau=\mathbf{${f2(tau)}}\ \mathrm{s}`,'k ≈ 0.2 W/m·K is assumed for silicone. Bi < 0.1: the fiber is nearly uniform across its section.'],
+ ['7 · Semi-physical profile (what the twin draws)',String.raw`\begin{gathered}T(x)=T_b+a\,e^{-x/L}+c,\quad \ln a,\ \ln L,\ \ln c=\theta_0+\theta_1\tilde t+\theta_2\tilde r+\theta_3\tilde f${tdef}\end{gathered}`,String.raw`a=${f2(semiPar(st.T,st.R,st.F).a)}\,^{\circ}\mathrm{C},\ L=${f2(semiPar(st.T,st.R,st.F).L)}\ \mathrm{cm},\ c=${f2(semiPar(st.T,st.R,st.F).c)}\,^{\circ}\mathrm{C}\ \Rightarrow\ T(${st.sd.toFixed(1)})=\mathbf{${pv.toFixed(1)}}\,^{\circ}\mathrm{C}`,'12 parameters fitted on 78 photos (T_b = 26.2 °C, the mean background). The exponential follows from the energy balance above; the offset c is the warm tail. Floor of 24 °C and non-increasing in x.'],
+ ['8 · Empirical diameter',String.raw`\begin{gathered}\ln d=c_0+c_1\tilde t+c_2\tilde r+c_3\tilde f${tdef}\end{gathered}`,String.raw`\ln d=${f2(DATA.Bd[0])}${sg(DATA.Bd[1])}(${tn})${sg(DATA.Bd[2])}(${rn})${sg(DATA.Bd[3])}(${fn})=${f2(lnd)}\Rightarrow d=\mathbf{${f3(Math.exp(lnd))}}\ \mathrm{mm}`,'Fitted on 25 diameters measured by the FrED camera (median of the valid readings).']];
+ const box=$('eqs');box.replaceChildren();
+ for(const [ix,e] of E.entries()){const c=document.createElement('div');c.className='eq'+(ix>=6?' wide':'');const h3=document.createElement('h3');h3.textContent=e[0];const f=document.createElement('div');f.className='f';f.appendChild(MathJax.tex2svg(e[1],{display:true}));const s=document.createElement('div');s.className='s';s.appendChild(MathJax.tex2svg(e[2],{display:false}));const p=document.createElement('p');p.textContent=e[3];c.append(h3,f,s,p);box.appendChild(c)}
+}
+(function w(){if(window.MathJax&&MathJax.startup&&MathJax.startup.promise){MathJax.startup.promise.then(()=>{mjReady=true;if(lastEq)renderEq(...lastEq)})}else setTimeout(w,100)})();
+render();
+</script>
